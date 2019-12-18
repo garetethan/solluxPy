@@ -19,11 +19,14 @@ from math import *
 import math
 from re import *
 from sys import argv
-from string import digits, ascii_uppercase
+from string import ascii_lowercase, ascii_uppercase, digits
 
 FLOATING_POINT_PRECISION = 5
 VAR_NAME_REGEX = r'[a-zA-Z_]+'
-DISALLOWED_VAR_NAMES = [function for function in dir(math) if function[0] != '_']
+DISALLOWED_VAR_NAMES = [i for i in dir(math) if i[0] != '_']
+DISALLOWED_VAR_NAMES.extend(['quit', 'exit', 'help', 'ops', 'e', 'pi', 'tau', 'sec', 'csc', 'cot', 'asec', 'acsc', 'acot', 'sind', 'cosd', 'tand', 'secd', 'cscd', 'cotd', 'asind', 'acosd', 'atand', 'asecd', 'acscd', 'acotd', 'sq', 'cb', 'cbrt', 'quadraticA', 'quadraticS', 'ln', 'logB', 'logC', 'logX', 'logTen', 'lg', 'exp', 'lcm', 'permute', 'choose', 'changeBase', 'printHelp', 'printOps'])
+# Create a space for the user to store numbers temporarily (not between runs).
+variables = {'_': 0, 'e': e, 'pi': pi, 'tau': tau}
 
 def textDriver():
 	'''Get an expression from the user at the command line. If it is a variable assignment, calc() the right hand side and save it. Otherwise, assume it to be a mathematical expression and print the result of calc()ing it.'''
@@ -37,73 +40,66 @@ def textDriver():
 			printOps()
 			return 2
 	
-	# The only sane way to round numbers.
-	getcontext().rounding = ROUND_HALF_UP
-	
-	# Create a space for the user to store numbers temporarily (not between runs).
-	# The name of this variable should remain consistent with the string literal inserted into expression below.
-	variables = {'ans': 0}
-	
 	print('Enter a mathematical expression to evaluate below, or \'quit\'.\n')
 	
 	# Identical line at the end of the following while loop.
 	expression = input('==> ')
-	while expression != 'quit' and expression != 'exit':
+	lineNumber = 0
+	while not expression.startswith('quit') and not expression.startswith('exit'):
 		if expression == 'help':
 			printHelp()
 			continue
+		elif expression == 'ops':
+			printOps()
+			continue
+		
+		lineVar = f'_{ascii_lowercase[lineNumber % 26]}'	
 		
 		# If it is a variable assignment, save the value
 		if '=' in expression:
-			varName, varValue = expression.split('=')
+			varName, varValue = expression.split('=', maxsplit=1)
 			varName = varName.strip()
-			varValue = insertVars(varValue, variables)
+			varValue = insertVars(varValue)
 			if varName in DISALLOWED_VAR_NAMES:
 				print(f'That name is not allowed because the math module has a variable or a method by that name.')
 			# As long as insertVars() was successful.
 			elif varValue:
-				if not match(f'^{VAR_NAME_REGEX}$', varName):
-					# Add underscore to beginning if first char is a digit.
-					if match(r'\d', varName[0]):
-						varName = '_' + varName
-					varName = sub(f'\W', r'_', varName.lower())
-					print(f'Value saved as {varName}')
+				if not fullmatch(VAR_NAME_REGEX, varName):
+					varName = sub(r'[^a-zA-Z_]', r'_', varName)
 				try:
 					variables[varName] = calc(varValue)
-				# I tried to use 'e' as the name of the error message, causing it to print 2.71828...
+					variables[lineVar] = variables[varName]
+					variables['_'] = variables[varName]
+					print(f'{lineVar} = {varName} = {variables[lineVar]}')
 				except NameError as err:
 					print(f'Error: {err}')
 		# Else it should be a mathematical expression to be evaluated (but it might include references to variables that have to be replaced with values).
 		else:
-			# Insert variable values.
-			expression = insertVars(expression, variables)
+			expression = insertVars(expression)
 			if expression:
 				try:
-					variables['ans'] = calc(expression)
-					print(variables['ans'])
-				except NameError as err:
+					variables[lineVar] = calc(expression)
+					variables['_'] = variables[lineVar]
+					print(f'{lineVar} = {variables[lineVar]}')
+				except (NameError, SyntaxError, ZeroDivisionError) as err:
 					print(f'Error: {err}')
 		
 		# Get input for next run.
 		expression = input('==> ')
+		lineNumber += 1
 	
 	return 0
-	
-def insertVars(expression, variables):
-	varNames = findall(VAR_NAME_REGEX, expression)
-	expParts = split(VAR_NAME_REGEX, expression)
-	newExp = expParts[0]
-	for i in range(len(varNames)):
+
+def insertVars(expression):
+		# Insert variable values.
+		varFinder = VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
+		
 		try:
-			newExp = f'{newExp}{variables[varNames[i]]}{expParts[i + 1]}'
+			expression = sub(varFinder, lambda m: str(variables[m[0]]), expression)
+			return expression
 		except KeyError as err:
-			# If variable is actually a constant from math module, leave it as text.
-			if varNames[i] in DISALLOWED_VAR_NAMES:
-				newExp = f'{newExp}{varNames[i]}{expParts[i + 1]}'
-			else:
-				print(f'Error: There is no defined variable named \'{err}\'.')
-				return None
-	return newExp
+			print(f'There is no variable called {err}.')
+			return None
 
 def calc(expression):
 	'''Evaluate a string expression. Do not catch any exceptions.'''
@@ -117,7 +113,6 @@ def calc(expression):
 		expression = expression.replace(old, replacements[old])
 	
 	# Let Python evaluate the filtered mathematical expression.
-	print(f'About to eval: \'{expression}\'')
 	return eval(expression)
 
 # Define missing trig functions.
@@ -185,10 +180,10 @@ def sqrt(num):
 	'''Return the positive square root of any positive, real number.
 	Defined here (overwriting the math module) just so that we can print a statement in the case of negative input.'''
 	try:
-		return sqrt(num)
+		return math.sqrt(num)
 	except ValueError as err:
 		print('Square root of a negative encountered. This calculator does not support imaginary numbers, so the square root of the absolute value of the given value has been used instead.')
-		return sqrt(-num)
+		return math.sqrt(-num)
 
 def cb(num):
 	return num ** 3
@@ -216,7 +211,7 @@ def logB(num, base):
 logC = logB
 logX = logB
 
-def log10(num):
+def logTen(num):
 	return logB(num, 10)
 
 def lg(num):
@@ -232,6 +227,7 @@ def lcm(a, b):
 # Permutations and combinations.
 def permute(n, r):
     return factorial(n) / factorial(n - r);
+
 def choose(n, r):
     return factorial(n) / (factorial(r) * factorial(n - r));
 
@@ -262,14 +258,14 @@ def changeBase(num, oldBase, newBase):
 		return newNum
 
 def printHelp():
-	with open('calculatorHelp.txt', 'r') as helpFile:
+	with open('help.md', 'r') as helpFile:
 		for line in helpFile:
 			if line[0] != '#':
 				print(line, end='')
 
 def printOps():
 	opList = []
-	with open('calculatorOps.csv', 'r') as opsFile:
+	with open('operations.csv', 'r') as opsFile:
 		for line in opsFile:
 			opList.append(line.split(';'))
 	print(opList)
