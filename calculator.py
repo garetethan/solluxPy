@@ -6,7 +6,6 @@ Written by Garet Robertson.
 I want to make a Python calculator around the eval() function.
 
 TODO:
-* Variables seem to be working, but I want '7x' to evaluate to 7 times the value of x rather than a variable named _7x (if creating the var) or 7 concatenated to x (if referencing the var). This will mean that variable names will NOT be allowed to have numbers ANYWHERE in them (otherwise it is impossible to tell if 'foo3bar' is one, two, or three values). (The only alternative would be to check when saving each var if its name is contained in another var, and rejecting it if so, but this sounds labour intensive, and I think the outcome is worse.)
 * Make a factorize or unmultiply function.
 * Once you get most of the other things working, I would like to be able to map keys on my keyboard to different things so that I do not have to use all of keys around the edge to type in a mathematical expression. (I don't know if there would be a good way to do this, though.)
 * math domain error is handled in sqrt(), but also needs to be handled in log().
@@ -20,8 +19,9 @@ import math
 from re import *
 from sys import argv
 from string import ascii_lowercase, ascii_uppercase, digits
+from pprint import pprint
 
-FLOATING_POINT_PRECISION = 5
+FLOAT_PRECISION = 6
 VAR_NAME_REGEX = r'[a-zA-Z_]+'
 DISALLOWED_VAR_NAMES = [i for i in dir(math) if i[0] != '_']
 DISALLOWED_VAR_NAMES.extend(['quit', 'exit', 'help', 'ops', 'e', 'pi', 'tau', 'sec', 'csc', 'cot', 'asec', 'acsc', 'acot', 'sind', 'cosd', 'tand', 'secd', 'cscd', 'cotd', 'asind', 'acosd', 'atand', 'asecd', 'acscd', 'acotd', 'sq', 'cb', 'cbrt', 'quadraticA', 'quadraticS', 'ln', 'logB', 'logC', 'logX', 'logTen', 'lg', 'exp', 'lcm', 'permute', 'choose', 'changeBase', 'printHelp', 'printOps'])
@@ -46,17 +46,14 @@ def textDriver():
 	expression = input('==> ')
 	lineNumber = 0
 	while not expression.startswith('quit') and not expression.startswith('exit'):
+		lineVar = f'_{ascii_lowercase[lineNumber % 26]}'	
 		if expression == 'help':
 			printHelp()
-			continue
 		elif expression == 'ops':
 			printOps()
-			continue
-		
-		lineVar = f'_{ascii_lowercase[lineNumber % 26]}'	
 		
 		# If it is a variable assignment, save the value
-		if '=' in expression:
+		elif '=' in expression:
 			varName, varValue = expression.split('=', maxsplit=1)
 			varName = varName.strip()
 			varValue = insertVars(varValue)
@@ -70,7 +67,7 @@ def textDriver():
 					variables[varName] = calc(varValue)
 					variables[lineVar] = variables[varName]
 					variables['_'] = variables[varName]
-					print(f'{lineVar} = {varName} = {variables[lineVar]}')
+					print(f'{lineVar} = {varName} = {variables[lineVar]:.{FLOAT_PRECISION}g}')
 				except NameError as err:
 					print(f'Error: {err}')
 		# Else it should be a mathematical expression to be evaluated (but it might include references to variables that have to be replaced with values).
@@ -80,7 +77,7 @@ def textDriver():
 				try:
 					variables[lineVar] = calc(expression)
 					variables['_'] = variables[lineVar]
-					print(f'{lineVar} = {variables[lineVar]}')
+					print(f'{lineVar} = {variables[lineVar]:.{FLOAT_PRECISION}g}')
 				except (NameError, SyntaxError, ZeroDivisionError) as err:
 					print(f'Error: {err}')
 		
@@ -91,9 +88,10 @@ def textDriver():
 	return 0
 
 def insertVars(expression):
+		# Make implicit multiplication between coefficients and variables explicit.
+		expression = sub(r'(\d)([a-zA-Z_])', r'\1*\2', expression)
 		# Insert variable values.
 		varFinder = VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
-		
 		try:
 			expression = sub(varFinder, lambda m: str(variables[m[0]]), expression)
 			return expression
@@ -217,19 +215,12 @@ def logTen(num):
 def lg(num):
 	return logC(num, 2)
 
-def exp(num):
-	return e ** num
-
 def lcm(a, b):
 	'''Lowest common multiple.'''
 	return a * b / gcd(a, b)
 
-# Permutations and combinations.
-def permute(n, r):
-    return factorial(n) / factorial(n - r);
-
-def choose(n, r):
-    return factorial(n) / (factorial(r) * factorial(n - r));
+permutations = perm
+combinations = comb
 
 def changeBase(num, oldBase, newBase):
 	'''Should not be used in combination with other functions in the same statement (because it returns a string not necessarily parsable as a float).
@@ -258,17 +249,10 @@ def changeBase(num, oldBase, newBase):
 		return newNum
 
 def printHelp():
-	with open('help.md', 'r') as helpFile:
+	with open('README.md', 'r') as helpFile:
 		for line in helpFile:
 			if line[0] != '#':
 				print(line, end='')
-
-def printOps():
-	opList = []
-	with open('operations.csv', 'r') as opsFile:
-		for line in opsFile:
-			opList.append(line.split(';'))
-	print(opList)
 
 if __name__ == '__main__':
 	textDriver()
