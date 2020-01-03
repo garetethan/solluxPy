@@ -9,7 +9,6 @@ TODO:
 * Make a factorize or unmultiply function.
 * Once you get most of the other things working, I would like to be able to map keys on my keyboard to different things so that I do not have to use all of keys around the edge to type in a mathematical expression. (I don't know if there would be a good way to do this, though.)
 * math domain error is handled in sqrt(), but also needs to be handled in log().
-* So I don't think I understand this completely, but I think that, because of the way I am using Decimals, they are imprecise, and therefore offer no clear advantage over just using floats. This is because I am allowing eval() to convert a string like '-2' or '3 + 5' into the number -2 and 8, respectively, before Decimal() ever gets a hold of them. I need to find a way to turn all numbers into decimals before anything else happens to them.
 * Consider transforming (...)! into factorial(...).
 '''
 
@@ -100,7 +99,7 @@ def insertVars(expression):
 			return None
 
 def calc(expression):
-	'''Evaluate a string expression. Do not catch any exceptions.'''
+	'''Evaluate a string expression (returning a float). Do not catch any exceptions.'''
 	
 	# Replace absolute-value bars with the abs() function that eval() will recognize.
 	# Assumes that absolute-value bars are never nested (which is impossible to tell for sure).
@@ -170,8 +169,8 @@ def acscd(num):
 def acotd(num):
 	return degrees(atan(1 / num))
 
-# Square, cube, and cuberoot.
 def sq(num):
+	'''Square.'''
 	return num ** 2
 
 def sqrt(num):
@@ -184,28 +183,31 @@ def sqrt(num):
 		return math.sqrt(-num)
 
 def cb(num):
+	'''Cube.'''
 	return num ** 3
 
 def cbrt(num):
+	'''Cube root.'''
 	return num ** (1 / 3)
 
-# Quadratic formula
-# Adds discriminant.
-def quadraticA(a, b, c):
+def quadraticAdd(a, b, c):
+	'''Attempt to solve ax^2 + bx + c = 0, adding the square root of the discriminant in the quadratic equation. Do not give solutions with a non-zero imaginary component.'''
 	return -b + sqrt(sq(b) - 4 * a * c) / 2 * a
+quadraticA = quadraticAdd
 
 # Subtracts discriminant.
-def quadraticS(a, b, c):
+def quadraticSubtract(a, b, c):
+	'''Attempt to solve ax^2 + bx + c = 0, subtracting the square root of the discriminant in the quadratic equation. Do not give solutions with a non-zero imaginary component.'''
 	return -b - sqrt(sq(b) - 4 * a * c) / 2 * a
+quadraticS = quadraticSubtract
+quadraticB = quadraticSubtract
 
-# This a function alias, not a variable declaration.
 ln = log
 
-# The letter b is used to represent the base because of [its use on Wikipedia](https://en.wikipedia.org/wiki/Logarithm).
 def logB(num, base):
+	'''General logarithm. The letter b is used to represent the base because of [its use on Wikipedia](https://en.wikipedia.org/wiki/Logarithm).'''
 	# Change-of-base formula.
 	return ln(num) / ln(base)
-
 logC = logB
 logX = logB
 
@@ -214,6 +216,7 @@ def logTen(num):
 
 def lg(num):
 	return logC(num, 2)
+logTwo = lg
 
 def lcm(a, b):
 	'''Lowest common multiple.'''
@@ -225,6 +228,10 @@ combinations = comb
 def changeBase(num, oldBase, newBase):
 	'''Should not be used in combination with other functions in the same statement (because it returns a string not necessarily parsable as a float).
 	num is assumed to be a string representation of an integer, and oldBase and newBase integers.'''
+	
+	if oldBase < 2 or oldBase > 36 or newBase < 2 or newBase > 36:
+		print('Error: Invalid base. Both bases must be positive integers no greater than 36.')
+		return ''
 	
 	# From oldBase to base 10.
 	num = int(num, oldBase)
