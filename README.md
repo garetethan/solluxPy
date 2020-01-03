@@ -30,7 +30,9 @@ _c = volume = 123.782
 
 ## List of Operations
 ### Native to Python
+
 Use | Clarifications
+--- | ---
 `x + y` |
 `x - y` | 
 `-x` | Negation, AKA unary minus.
@@ -42,7 +44,9 @@ Use | Clarifications
 
 ### Imported
 All functions in [Python's math module](https://docs.python.org/3/library/math.html) are available (though some as noted below have different names). A few of the common ones are listed here.
+
 Use | Clarifications
+--- | ---
 `acos(x)` | Arccosine, AKA inverse cosine, where the result is given in radians.
 `asin(x)` | Arcsine, AKA inverse sine, where the result is given in radians.
 `atan(x)` | Arctangent, AKA inverse tangent, where the result is given in radians.
@@ -61,7 +65,9 @@ Use | Clarifications
 `tan(x)` | Tangent, where `x` is given in radians.
 
 ### Implemented
+
 Use | Clarifications
+--- | ---
 `sec(x)` | Secant, where `x` is given in radians.
 `csc(x)` | Cosecant, where `x` is given in radians.
 `cot(x)` | Cotangent, where `x` is given in radians.
