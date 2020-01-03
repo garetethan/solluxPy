@@ -7,9 +7,10 @@ I want to make a Python calculator around the eval() function.
 
 TODO:
 * Make a factorize or unmultiply function.
-* Once you get most of the other things working, I would like to be able to map keys on my keyboard to different things so that I do not have to use all of keys around the edge to type in a mathematical expression. (I don't know if there would be a good way to do this, though.)
-* math domain error is handled in sqrt(), but also needs to be handled in log().
-* Consider transforming (...)! into factorial(...).
+* math domain error is handled in sqrt(), but to be consistent I should also be handling it in all of the logarithms and arc trig functions. I think it makes more sense to remove the check in sqrt() and handle ValueError in textDriver().
+* Consider transforming `(...)!` into `factorial(...)`.
+* `perm` and `comb` don't seem to exist in the math module. Figure out what they are called there and correct the aliases (currently commented out).
+* Prevent the variable parsing from messing with letters in the argument of changeBase(), or consider moving this to a different calculator.
 '''
 
 from math import *
@@ -222,8 +223,8 @@ def lcm(a, b):
 	'''Lowest common multiple.'''
 	return a * b / gcd(a, b)
 
-permutations = perm
-combinations = comb
+# permutations = perm
+# combinations = comb
 
 def changeBase(num, oldBase, newBase):
 	'''Should not be used in combination with other functions in the same statement (because it returns a string not necessarily parsable as a float).
