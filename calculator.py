@@ -6,7 +6,6 @@ Written by Garet Robertson.
 I want to make a Python calculator around the eval() function.
 
 TODO:
-* Prevent the variable parsing from messing with letters in the argument of changeBase(), or consider moving this to a different calculator.
 * Improve the replacement of `!` with `factorial(...)`.
 * Add an `nroot()` function.
 '''
@@ -16,25 +15,27 @@ from re import fullmatch, sub
 from string import ascii_lowercase
 from sys import argv
 
-FLOAT_PRECISION = 6
 VAR_NAME_REGEX = r'[a-zA-Z_]+'
 # Create a space for the user to store numbers temporarily (not between runs).
-variables = {'_': 0, 'e': e, 'pi': pi, 'tau': tau}
+# '_' stores the last calculated result, and '_precision' limits how many digits of floating point results are printed.
+variables = {'_': 0, '_precision': 6, 'e': e, 'pi': pi, 'tau': tau}
 
 def main():
-	'''Get an expression from the user at the command line. If it is a variable assignment, calc() the right hand side and save it. Otherwise, assume it to be a mathematical expression and print the result of calc()ing it.'''
+	'''Get an expression from the user at the command line. If it is a variable assignment, evaluate right hand side and save it. Otherwise, assume it to be a mathematical expression, evaluate it, and save and print the result.'''
 	global variables
 
-	# First check if any flags were given.
-	if len(argv) > 1:
+	# Parse flags.
+	for flag in argv[1:]:
 		# 0 - 2 hyphens followed by either 'h' or 'help'.
-		if fullmatch(r'-{0,2}h(?:elp)?', argv[1]):
+		if fullmatch(r'-{0,2}h(?:elp)?', flag):
 			printHelp()
 			return 1
+		elif fullmatch(r'-{0,2}p(?:recision)?[= ]\d+', flag):
+			variables['_precision'] = int(flag.split('=', maxsplit=1)[1])
 		else:
-			print(f'Unrecognized flag (\'{argv[1]}\').')
+			print(f'Unrecognized flag: \'{argv[1]}\'.')
 	
-	print('Enter a mathematical expression to evaluate below, or \'quit\'.\n')
+	print('Enter a mathematical expression to evaluate, a variable declaration, or \'exit\'.\n')
 	
 	expression = ''
 	lineNumber = 0
@@ -67,9 +68,9 @@ def main():
 			if not fullmatch(VAR_NAME_REGEX, varName):
 				varName = sub(r'[^a-zA-Z_]', '_', varName)
 			variables[varName] = variables[lineVar]
-			print(f'{lineVar} = {varName} = {variables[lineVar]:.{FLOAT_PRECISION}g}')
+			print(f'{lineVar} = {varName} = {variables[lineVar]:.{variables["_precision"]}g}')
 		else:
-			print(f'{lineVar} = {variables[lineVar]:.{FLOAT_PRECISION}g}')
+			print(f'{lineVar} = {variables[lineVar]:.{variables["_precision"]}g}')
 		
 	return 0
 
@@ -99,73 +100,99 @@ def calc(expression):
 	return eval(expression)
 
 # Define missing trig functions.
-def sec(num):
-	return 1 / cos(num)
+def sec(x):
+	'''Secant.'''
+	return 1 / cos(x)
 
-def csc(num):
-	return 1 / sin(num)
+def csc(x):
+	'''Cosecant.'''
+	return 1 / sin(x)
 
-def cot(num):
-	return 1 / tan(num)
+def cot(x):
+	'''Cotangent.'''
+	return 1 / tan(x)
 
-def asec(num):
-	return acos(1 / num)
+def asec(x):
+	'''Arcsecant.'''
+	return acos(1 / x)
 
-def acsc(num):
-	return asin(1 / num)
+def acsc(x):
+	'''Arccosecant.'''
+	return asin(1 / x)
 
-def acot(num):
-	return acot(1 / num)
+def acot(x):
+	'''Arccotangent.'''
+	return acot(1 / x)
 
 # Define trig functions that assume inputs are in degrees.
-def sind(num):
-	return sin(radians(num))
+def sind(x):
+	'''Sine (degrees).'''
+	return sin(radians(x))
 
-def cosd(num):
-	return cos(radians(num))
+def cosd(x):
+	'''Cosine (degrees).'''
+	return cos(radians(x))
 
-def tand(num):
-	return tan(radians(num))
+def tand(x):
+	'''Tangent (degrees).'''
+	return tan(radians(x))
 
-def secd(num):
-	return 1 / cos(radians(num))
+def secd(x):
+	'''Secant (degrees).'''
+	return 1 / cos(radians(x))
 
-def cscd(num):
-	return 1 / sin(radians(num))
+def cscd(x):
+	'''Cosecant (degrees).'''
+	return 1 / sin(radians(x))
 
-def cotd(num):
-	return 1 / tan(radians(num))
+def cotd(x):
+	'''Cotangent (degrees).'''
+	return 1 / tan(radians(x))
 
 # Define arc (inverse) trig functions that convert outputs to degrees.
-def asind(num):
-	return degrees(asin(num))
+def asind(x):
+	'''Arcsine (degrees).'''
+	return degrees(asin(x))
 
-def acosd(num):
-	return degrees(acos(num))
+def acosd(x):
+	'''Arccosine (degrees).'''
+	return degrees(acos(x))
 
-def atand(num):
-	return degrees(atan(num))
+def atand(x):
+	'''Arctangent (degrees).'''
+	return degrees(atan(x))
 
-def asecd(num):
-	return degrees(acos(1 / num))
+def asecd(x):
+	'''Arcsecant (degrees).'''
+	return degrees(acos(1 / x))
 
-def acscd(num):
-	return degrees(asin(1 / num))
+def acscd(x):
+	'''Arccosecant (degrees).'''
+	return degrees(asin(1 / x))
 
-def acotd(num):
-	return degrees(atan(1 / num))
+def acotd(x):
+	'''Arccotangent (degrees).'''
+	return degrees(atan(1 / x))
 
-def sq(num):
+def sq(x):
 	'''Square.'''
-	return num ** 2
+	return x ** 2
 
-def cb(num):
+def cb(x):
 	'''Cube.'''
-	return num ** 3
+	return x ** 3
 
-def cbrt(num):
+def nroot(x, n):
+	'''The `n`th root of x. `n` is used to represent the degree of the root because of [its use on Wikipedia](https://en.wikipedia.org/wiki/Nth_root).'''
+	return x ** (1 / n)
+nthroot = nroot
+rootn = nroot
+rootN = nroot
+yroot = nroot
+
+def cbrt(x):
 	'''Cube root.'''
-	return num ** (1 / 3)
+	return x ** (1 / 3)
 
 def quadraticAdd(a, b, c):
 	'''Attempt to solve ax^2 + bx + c = 0, adding the square root of the discriminant in the quadratic equation. Do not give solutions with a non-zero imaginary component.'''
@@ -181,20 +208,20 @@ quadraticB = quadraticSubtract
 
 ln = log
 
-def logB(num, base):
-	'''General logarithm. The letter b is used to represent the base because of [its use on Wikipedia](https://en.wikipedia.org/wiki/Logarithm).'''
-	# Change-of-base formula.
-	return ln(num) / ln(base)
-logC = logB
-logX = logB
+def logb(x, b):
+	'''General logarithm. `b` is used to represent the base because of [its use on Wikipedia](https://en.wikipedia.org/wiki/Logarithm).'''
+	return ln(x) / ln(b)
+logB = logb
+logc = logb
+logC = logb
 
-def logTen(num):
+def logTen(x):
 	'''Base 10 logarithm.'''
-	return logB(num, 10)
+	return logB(x, 10)
 
-def lg(num):
+def lg(x):
 	'''Base 2 logarithm.'''
-	return logC(num, 2)
+	return logC(x, 2)
 logTwo = lg
 
 def lcm(a, b):
@@ -211,6 +238,7 @@ def perm(n, k=None):
 	else:
 		return 0
 permutations = perm
+permute = perm
 
 def comb(n, k):
 	'''Combinations.'''
@@ -219,6 +247,7 @@ def comb(n, k):
 	else:
 		return 0
 combinations = comb
+combine = comb
 
 def printHelp():
 	with open('README.md', 'r') as helpFile:

@@ -22,6 +22,13 @@ class TestArithmetic(TestCase):
 		self.assertAlmostEqual(calc('3.1 / 4.1'), 31 / 41)
 		self.assertRaises(ZeroDivisionError, calc, '3.1 / 0')
 
+class TestBitwise(TestCase):
+	def testBitwiseOr(self):
+		self.assertEqual(calc('3 | 4'), 7)
+	
+	def testBitwiseAnd(self):
+		self.assertEqual(calc('3 & 4'), 0)
+	
 class TestTrigonometry(TestCase):
 	def testSec(self):
 		self.assertAlmostEqual(calc(f'sec({PI_OVER_SIX})'), 2 / sqrt(3))

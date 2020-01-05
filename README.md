@@ -9,7 +9,7 @@ _b = 1.4142135623730951
 The calculator does respect the normal order of operations (e.g. multiplication before addition). Use parentheses (`()`) as necessary, but avoid brackets (`[]`) and braces (`{}`).
 
 ## Variables
-Notice that each result line in the examples above starts with `_x = ` where `x` is some letter. The calculator is automatically saving each result for you so that you can reference it later in another expression:
+Notice that each result line in the examples above starts with `_x =` where `x` is some letter. The calculator is automatically saving each result for you so that you can reference it later in another expression:
 ```
 ==> ln(2)
 _c = 0.6931471805599453
@@ -41,11 +41,11 @@ Use | Clarifications
 `x / y` |
 `x // y` | Floor division, AKA integer division.
 `x % y` | Modulo, AKA the remainder of division.
-`x | y` | Bit-wise OR.
+`x \| y` | Bit-wise OR.
 `x & y` | Bit-wise AND.
 
 ### Imported
-All functions in [Python's math module](https://docs.python.org/3/library/math.html) are available (though some as noted below have different names). A few of the common ones are listed here.
+All functions in [Python's math module](https://docs.python.org/3/library/math.html) are available (though some as noted below have different names). Here are a few I find useful:
 
 Use | Clarifications
 --- | ---
@@ -58,7 +58,7 @@ Use | Clarifications
 `floor(x)` |
 `gcd(a, b)` | The greatest common divisor of `a` and `b`.
 `log(x)` | The *natural (base e)* logarithm. Also aliased as `ln(x)`.
-`log(x, base)` | The base `base` logarithm of `x`. Also aliased as `logB(x, b)`, `logC(x, b)`, and `logX(x, b)`.
+`log(x, b)` | The base `b` logarithm of `x`. Also aliased as `logb(x, b)`, `logB(x, b)`, `logc(x, b)`, and `logC(x, b)`.
 `lg(x)` | The base 2 logarithm of x. This is listed in the math module as `log2(x)`, but it can *not* be used this way. Also aliased as `logTwo(x)`.
 `logTen(x)` | The base 10 logarithm of x. This is listed in the math module as `log10(x)`, but it can *not* be used this way.
 `sin(x)` | Sine, where `x` is given in radians.
@@ -97,9 +97,10 @@ Use | Clarifications
 `acotd(x)` | Arccotangent, where the result is given in degrees.
 `sq(x)` | Square.
 `cb(x)` | Cube.
+`nroot(x)` | The `n`th root of x. Also aliased as `nthroot(x, n)`, `rootn(x, n)`, `rootN(x, n)`, and `yroot(x, n)`.
 `cbrt(x)` | Cube root.
 `quadraticAdd(a, b, c)` | Attempts to find a real solution to `a*x^2 + b*x + c = 0` using the quadratic equation and adding the square root of the discriminant. Does not handle negative discriminants well. Also aliased as `quadraticA(a, b, c)`.
 `quadraticSubtract(a, b, c)` | Attempts to find a real solution to `a*x^2 + b*x + c = 0` using the quadratic equation and subtracting the square root of the discriminant. Does not handle negative discriminants well. Also aliased as `quadraticS(a, b, c)` and `quadraticB(a, b, c)`.
 `lcm(a, b)` | Lowest common multiple, AKA least common multiple.
-`perm(n, k=None)` | *Overwrites math.perm in Python 3.8+.* The number of ways to order n items (when k is not given), or the number of ways to select k items from n items when the order of the selected items matters. Also aliased as `permutations(n, k)`.
-`comb(n, k)` | *Overwrites math.comb in Python 3.8+.* The number of ways to select k items from n items when the order of the selected items does not matter. Also aliased as `combinations(n, k)`.
+`perm(n, k=None)` | *Overwrites math.perm in Python 3.8+.* The number of ways to order n items (when k is not given), or the number of ways to select k items from n items when the order of the selected items matters. Also aliased as `permutations(n, k)` and `permute(n, k)`.
+`comb(n, k)` | *Overwrites math.comb in Python 3.8+.* The number of ways to select k items from n items when the order of the selected items does not matter. Also aliased as `combinations(n, k)` and `combine(n, k)`.
