@@ -122,7 +122,10 @@ def acsc(x):
 
 def acot(x):
 	'''Arccotangent.'''
-	return acot(1 / x)
+	if x == 0:
+		return -pi / 2
+	else:
+		return atan(1 / x)
 
 # Define trig functions that assume inputs are in degrees.
 def sind(x):
@@ -139,15 +142,15 @@ def tand(x):
 
 def secd(x):
 	'''Secant (degrees).'''
-	return 1 / cos(radians(x))
+	return sec(radians(x))
 
 def cscd(x):
 	'''Cosecant (degrees).'''
-	return 1 / sin(radians(x))
+	return csc(radians(x))
 
 def cotd(x):
 	'''Cotangent (degrees).'''
-	return 1 / tan(radians(x))
+	return cot(radians(x))
 
 # Define arc (inverse) trig functions that convert outputs to degrees.
 def asind(x):
@@ -164,15 +167,15 @@ def atand(x):
 
 def asecd(x):
 	'''Arcsecant (degrees).'''
-	return degrees(acos(1 / x))
+	return degrees(asec(x))
 
 def acscd(x):
 	'''Arccosecant (degrees).'''
-	return degrees(asin(1 / x))
+	return degrees(acsc(x))
 
 def acotd(x):
 	'''Arccotangent (degrees).'''
-	return degrees(atan(1 / x))
+	return degrees(acot(x))
 
 def sq(x):
 	'''Square.'''
