@@ -6,8 +6,9 @@ Written by Garet Robertson.
 I want to make a Python calculator around the eval() function.
 
 TODO:
-* Consider transforming `(...)!` into `factorial(...)`.
 * Prevent the variable parsing from messing with letters in the argument of changeBase(), or consider moving this to a different calculator.
+* Improve the replacement of `!` with `factorial(...)`.
+* Add an `nroot()` function.
 '''
 
 from math import *
@@ -168,13 +169,13 @@ def cbrt(num):
 
 def quadraticAdd(a, b, c):
 	'''Attempt to solve ax^2 + bx + c = 0, adding the square root of the discriminant in the quadratic equation. Do not give solutions with a non-zero imaginary component.'''
-	return -b + sqrt(sq(b) - 4 * a * c) / 2 * a
+	return (-b + sqrt(sq(b) - 4 * a * c)) / (2 * a)
 quadraticA = quadraticAdd
 
 # Subtracts discriminant.
 def quadraticSubtract(a, b, c):
 	'''Attempt to solve ax^2 + bx + c = 0, subtracting the square root of the discriminant in the quadratic equation. Do not give solutions with a non-zero imaginary component.'''
-	return -b - sqrt(sq(b) - 4 * a * c) / 2 * a
+	return (-b - sqrt(sq(b) - 4 * a * c)) / (2 * a)
 quadraticS = quadraticSubtract
 quadraticB = quadraticSubtract
 
