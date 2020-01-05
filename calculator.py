@@ -6,105 +6,89 @@ Written by Garet Robertson.
 I want to make a Python calculator around the eval() function.
 
 TODO:
-* Make a factorize or unmultiply function.
-* math domain error is handled in sqrt(), but to be consistent I should also be handling it in all of the logarithms and arc trig functions. I think it makes more sense to remove the check in sqrt() and handle ValueError in textDriver().
 * Consider transforming `(...)!` into `factorial(...)`.
-* `perm` and `comb` don't seem to exist in the math module. Figure out what they are called there and correct the aliases (currently commented out).
 * Prevent the variable parsing from messing with letters in the argument of changeBase(), or consider moving this to a different calculator.
 '''
 
 from math import *
-# Necessary for DISALLOWED_VAR_NAMES below.
-import math
-from re import *
+from re import fullmatch, sub
+from string import ascii_lowercase
 from sys import argv
-from string import ascii_lowercase, ascii_uppercase, digits
-from pprint import pprint
 
 FLOAT_PRECISION = 6
 VAR_NAME_REGEX = r'[a-zA-Z_]+'
-DISALLOWED_VAR_NAMES = [i for i in dir(math) if i[0] != '_']
-DISALLOWED_VAR_NAMES.extend(['quit', 'exit', 'help', 'ops', 'e', 'pi', 'tau', 'sec', 'csc', 'cot', 'asec', 'acsc', 'acot', 'sind', 'cosd', 'tand', 'secd', 'cscd', 'cotd', 'asind', 'acosd', 'atand', 'asecd', 'acscd', 'acotd', 'sq', 'cb', 'cbrt', 'quadraticA', 'quadraticS', 'ln', 'logB', 'logC', 'logX', 'logTen', 'lg', 'exp', 'lcm', 'permute', 'choose', 'changeBase', 'printHelp', 'printOps'])
 # Create a space for the user to store numbers temporarily (not between runs).
 variables = {'_': 0, 'e': e, 'pi': pi, 'tau': tau}
 
-def textDriver():
+def main():
 	'''Get an expression from the user at the command line. If it is a variable assignment, calc() the right hand side and save it. Otherwise, assume it to be a mathematical expression and print the result of calc()ing it.'''
+	global variables
+
 	# First check if any flags were given.
 	if len(argv) > 1:
-		if argv[1] == 'help':
+		# 0 - 2 hyphens followed by either 'h' or 'help'.
+		if fullmatch(r'-{0,2}h(?:elp)?', argv[1]):
 			printHelp()
 			return 1
-		
-		if argv[1] == 'ops':
-			printOps()
-			return 2
+		else:
+			print(f'Unrecognized flag (\'{argv[1]}\').')
 	
 	print('Enter a mathematical expression to evaluate below, or \'quit\'.\n')
 	
-	# Identical line at the end of the following while loop.
-	expression = input('==> ')
+	expression = ''
 	lineNumber = 0
-	while not expression.startswith('quit') and not expression.startswith('exit'):
+	while True:
+		expression = input('==> ')
 		lineVar = f'_{ascii_lowercase[lineNumber % 26]}'	
+		lineNumber += 1
+		if expression.startswith('exit') or expression.startswith('quit'):
+			break
 		if expression == 'help':
 			printHelp()
-		elif expression == 'ops':
-			printOps()
-		
-		# If it is a variable assignment, save the value
-		elif '=' in expression:
-			varName, varValue = expression.split('=', maxsplit=1)
+			continue
+		if '=' in expression:
+			varName, expression = expression.split('=', maxsplit=1)
 			varName = varName.strip()
-			varValue = insertVars(varValue)
-			if varName in DISALLOWED_VAR_NAMES:
-				print(f'That name is not allowed because the math module has a variable or a method by that name.')
-			# As long as insertVars() was successful.
-			elif varValue:
-				if not fullmatch(VAR_NAME_REGEX, varName):
-					varName = sub(r'[^a-zA-Z_]', r'_', varName)
-				try:
-					variables[varName] = calc(varValue)
-					variables[lineVar] = variables[varName]
-					variables['_'] = variables[varName]
-					print(f'{lineVar} = {varName} = {variables[lineVar]:.{FLOAT_PRECISION}g}')
-				except NameError as err:
-					print(f'Error: {err}')
-		# Else it should be a mathematical expression to be evaluated (but it might include references to variables that have to be replaced with values).
 		else:
+			varName = None
+		try:
 			expression = insertVars(expression)
-			if expression:
-				try:
-					variables[lineVar] = calc(expression)
-					variables['_'] = variables[lineVar]
-					print(f'{lineVar} = {variables[lineVar]:.{FLOAT_PRECISION}g}')
-				except (NameError, SyntaxError, ZeroDivisionError) as err:
-					print(f'Error: {err}')
+		except KeyError as err:
+			print(f'There is no variable called {err}.')
+			continue
+		try:
+			variables[lineVar] = calc(expression)
+			variables['_'] = variables[lineVar]
+		except (NameError, SyntaxError, ValueError, ZeroDivisionError) as err:
+			print(f'Error: {err}')
+			continue
+		if varName:
+			if not fullmatch(VAR_NAME_REGEX, varName):
+				varName = sub(r'[^a-zA-Z_]', '_', varName)
+			variables[varName] = variables[lineVar]
+			print(f'{lineVar} = {varName} = {variables[lineVar]:.{FLOAT_PRECISION}g}')
+		else:
+			print(f'{lineVar} = {variables[lineVar]:.{FLOAT_PRECISION}g}')
 		
-		# Get input for next run.
-		expression = input('==> ')
-		lineNumber += 1
-	
 	return 0
 
 def insertVars(expression):
-		# Make implicit multiplication between coefficients and variables explicit.
-		expression = sub(r'(\d)([a-zA-Z_])', r'\1*\2', expression)
-		# Insert variable values.
-		varFinder = VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
-		try:
-			expression = sub(varFinder, lambda m: str(variables[m[0]]), expression)
-			return expression
-		except KeyError as err:
-			print(f'There is no variable called {err}.')
-			return None
+	'''Replace variable names with their values in expression.'''
+	# Make implicit multiplication between coefficients and variables explicit.
+	expression = sub(r'(\d)([a-zA-Z_])', r'\1*\2', expression)
+	# Insert variable values.
+	varFinder = VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
+	expression = sub(varFinder, lambda m: str(variables[m[0]]), expression)
+	return expression
 
 def calc(expression):
 	'''Evaluate a string expression (returning a float). Do not catch any exceptions.'''
 	
 	# Replace absolute-value bars with the abs() function that eval() will recognize.
-	# Assumes that absolute-value bars are never nested (which is impossible to tell for sure).
+	# Assumes that absolute-value bars are never nested. (If they were it would likely make the expression ambiguous.)
 	expression = sub(r'\|(.*?)\|', r'abs(\1)', expression)
+	# Replace 3! with factorial(3). Does not bother trying to match non-integers since factorial() would reject them anyways.
+	expression = sub(r'(\d+)!', r'factorial(\1)', expression)
 	# Replace '^' (Python XOR) with '**' (exponentiation) and ')(' with ')*(' (implicit multiplication).
 	replacements = {'^': '**', ')(': ')*('}
 	for old in replacements:
@@ -174,15 +158,6 @@ def sq(num):
 	'''Square.'''
 	return num ** 2
 
-def sqrt(num):
-	'''Return the positive square root of any positive, real number.
-	Defined here (overwriting the math module) just so that we can print a statement in the case of negative input.'''
-	try:
-		return math.sqrt(num)
-	except ValueError as err:
-		print('Square root of a negative encountered. This calculator does not support imaginary numbers, so the square root of the absolute value of the given value has been used instead.')
-		return math.sqrt(-num)
-
 def cb(num):
 	'''Cube.'''
 	return num ** 3
@@ -213,9 +188,11 @@ logC = logB
 logX = logB
 
 def logTen(num):
+	'''Base 10 logarithm.'''
 	return logB(num, 10)
 
 def lg(num):
+	'''Base 2 logarithm.'''
 	return logC(num, 2)
 logTwo = lg
 
@@ -223,44 +200,29 @@ def lcm(a, b):
 	'''Lowest common multiple.'''
 	return a * b / gcd(a, b)
 
-# permutations = perm
-# combinations = comb
-
-def changeBase(num, oldBase, newBase):
-	'''Should not be used in combination with other functions in the same statement (because it returns a string not necessarily parsable as a float).
-	num is assumed to be a string representation of an integer, and oldBase and newBase integers.'''
-	
-	if oldBase < 2 or oldBase > 36 or newBase < 2 or newBase > 36:
-		print('Error: Invalid base. Both bases must be positive integers no greater than 36.')
-		return ''
-	
-	# From oldBase to base 10.
-	num = int(num, oldBase)
-
-	# From base 10 to newBase.
-	if newBase == 10:
-		return num
+# perm and comb are defined in math in Python 3.8, but I have defined them separately here because Debian stable's latest version of Python is still 3.7 (2020-01-04).
+def perm(n, k=None):
+	'''Permutations.'''
+	if k is None:
+		return factorial(n)
+	elif k <= n:
+		return factorial(n) / factorial(n - k)
 	else:
-		# Define list of symbols used as digits
-		# Lists of chars come from the string module.
-		symbols = digits + ascii_uppercase
-	
-		# Uses "the division method"
-		isNeg = oldNum < 0
-		oldNum = abs(oldNum)
-		newNum = ''
-		while oldNum:
-			newNum = f'{symbols[oldNum % newBase]}{newNum}'
-			oldNum //= newBase
-		if isNeg:
-			newNum = f'-{newNum}'
-		return newNum
+		return 0
+permutations = perm
+
+def comb(n, k):
+	'''Combinations.'''
+	if k <= n:
+		return factorial(n) / (factorial(k) * factorial(n - k))
+	else:
+		return 0
+combinations = comb
 
 def printHelp():
 	with open('README.md', 'r') as helpFile:
 		for line in helpFile:
-			if line[0] != '#':
-				print(line, end='')
+			print(line, end='')
 
 if __name__ == '__main__':
-	textDriver()
+	main()
