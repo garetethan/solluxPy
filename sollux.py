@@ -1,13 +1,10 @@
 '''
+sollux.py
+https://github.com/garetethan/solluxPy
 Created on Dec 24, 2017
-
-Written by Garet Robertson.
-
-I want to make a Python calculator around the eval() function.
 
 TODO:
 * Improve the replacement of `!` with `factorial(...)`.
-* Add an `nroot()` function.
 '''
 
 from math import *
@@ -30,7 +27,7 @@ def main():
 		if fullmatch(r'-{0,2}h(?:elp)?', flag):
 			printHelp()
 			return 1
-		elif fullmatch(r'-{0,2}p(?:recision)?[= ]\d+', flag):
+		elif fullmatch(r'-{0,2}p(?:recision)?=\d+', flag):
 			variables['_precision'] = int(flag.split('=', maxsplit=1)[1])
 		else:
 			print(f'Unrecognized flag: \'{argv[1]}\'.')

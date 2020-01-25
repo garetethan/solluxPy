@@ -1,9 +1,11 @@
 '''
-Tests for the calculator.py program.
+testSollux.py
+https://github.com/garetethan/solluxPy
+Tests for sollux.py.
 '''
 
 from unittest import main, TestCase
-from calculator import calc
+from sollux import calc
 from math import pi, sqrt
 
 PI_OVER_SIX = pi / 6

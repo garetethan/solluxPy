@@ -1,20 +1,20 @@
-# pyCalc
-Type in a mathematical expression (not an equation) to have it evaluated. Expression examples:
+# solluxPy
+solluxPy is a terminal calculator built with Python. Type in a mathematical expression (not an equation) to have it evaluated. Expression examples:
 ```
 ==> 2 + 7
 _a = 9
 ==> sqrt(2)
-_b = 1.4142135623730951
+_b = 1.41421
 ```
-The calculator does respect the normal order of operations (e.g. multiplication before addition). Use parentheses (`()`) as necessary, but avoid brackets (`[]`) and braces (`{}`).
+The calculator has the same order of operations as Python, which is probably the order that you expect. Use parentheses (`()`) as necessary, but avoid brackets (`[]`) and braces (`{}`).
 
 ## Variables
-Notice that each result line in the examples above starts with `_x =` where `x` is some letter. The calculator is automatically saving each result for you so that you can reference it later in another expression:
+Notice that each result line in the examples above starts with `_<letter> =`. The calculator is automatically saving each result for you so that you can reference it later in another expression:
 ```
 ==> ln(2)
-_c = 0.6931471805599453
-==> _c / ln(3)
-_d = 0.6309297535714574
+_a = 0.693147
+==> _a / ln(3)
+_b = 0.63093
 ```
 (This will eventually loop around and overwrite old results.)
 
@@ -26,6 +26,20 @@ _a = radius = 3.1
 _b = height = 4.1
 ==> volume = pi * radius^2 * height
 _c = volume = 123.782
+```
+
+## Precision
+By default all values are printed with six significant digits (even though many more are available), but this can be changed either when starting the program or any time during execution:
+```
+$ python3 sollux.py -p=12
+Enter a mathematical expression to evaluate, a variable declaration, or 'exit'.
+
+==> sqrt(2)
+_a = 1.41421356237
+==> _precision = 3
+_b = _precision = 3
+==> _a   
+_c = 1.41
 ```
 
 ## List of Operations
@@ -104,3 +118,6 @@ Use | Clarifications
 `lcm(a, b)` | Lowest common multiple, AKA least common multiple, where `a` and `b` must both be integers.
 `perm(n, k=None)` | *Overwrites math.perm in Python 3.8+.* The number of ways to order n items (when k is not given), or the number of ways to select k items from n items when the order of the selected items matters. Also aliased as `permutations(n, k)` and `permute(n, k)`.
 `comb(n, k)` | *Overwrites math.comb in Python 3.8+.* The number of ways to select k items from n items when the order of the selected items does not matter. Also aliased as `combinations(n, k)` and `combine(n, k)`.
+
+## Name
+The name Sollux comes from [Homestuck](https://www.homestuck.com/).
