@@ -23,22 +23,23 @@ def main():
 
 	# Parse flags.
 	for flag in argv[1:]:
-		# 0 - 2 hyphens followed by either 'h' or 'help'.
+		# 0 - 2 hyphens, then 'h' or 'help'.
 		if fullmatch(r'-{0,2}h(?:elp)?', flag):
 			printHelp()
 			return 1
+		# 0 - 2 hyphens, then 'p=' or 'precision=', then one or more digits.
 		elif fullmatch(r'-{0,2}p(?:recision)?=\d+', flag):
 			variables['_precision'] = int(flag.split('=', maxsplit=1)[1])
 		else:
 			print(f'Unrecognized flag: \'{argv[1]}\'.')
-	
+
 	print('Enter a mathematical expression to evaluate, a variable declaration, or \'exit\'.\n')
-	
+
 	expression = ''
 	lineNumber = 0
 	while True:
 		expression = input('==> ')
-		lineVar = f'_{ascii_lowercase[lineNumber % 26]}'	
+		lineVar = f'_{ascii_lowercase[lineNumber % 26]}'
 		lineNumber += 1
 		if expression.startswith('exit') or expression.startswith('quit'):
 			break
@@ -62,37 +63,39 @@ def main():
 			print(f'Error: {err}')
 			continue
 		if varName:
+			# If any chars in varName are invalid, replace them with underscores.
 			if not fullmatch(VAR_NAME_REGEX, varName):
 				varName = sub(r'[^a-zA-Z_]', '_', varName)
 			variables[varName] = variables[lineVar]
 			print(f'{lineVar} = {varName} = {variables[lineVar]:.{variables["_precision"]}g}')
 		else:
 			print(f'{lineVar} = {variables[lineVar]:.{variables["_precision"]}g}')
-		
+
 	return 0
 
 def insertVars(expression):
 	'''Replace variable names with their values in expression.'''
-	# Make implicit multiplication between coefficients and variables explicit.
+	# Make implicit multiplication between coefficients and functions and variables explicit.
 	expression = sub(r'(\d)([a-zA-Z_])', r'\1*\2', expression)
-	# Insert variable values.
+	# Look for a variable name followed by anything but '('.
 	varFinder = VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
+	# Insert variable values.
 	expression = sub(varFinder, lambda m: str(variables[m[0]]), expression)
 	return expression
 
 def calc(expression):
 	'''Evaluate a string expression (returning a float). Do not catch any exceptions.'''
-	
+
 	# Replace absolute-value bars with the abs() function that eval() will recognize.
 	# Assumes that absolute-value bars are never nested. (If they were it would likely make the expression ambiguous.)
 	expression = sub(r'\|(.*?)\|', r'abs(\1)', expression)
-	# Replace 3! with factorial(3). Does not bother trying to match non-integers since factorial() would reject them anyways.
+	# Replace <int>! with factorial(<int>). Does not bother trying to match non-integers since factorial() would reject them anyways.
 	expression = sub(r'(\d+)!', r'factorial(\1)', expression)
 	# Replace '^' (Python XOR) with '**' (exponentiation) and ')(' with ')*(' (implicit multiplication).
 	replacements = {'^': '**', ')(': ')*('}
 	for old in replacements:
 		expression = expression.replace(old, replacements[old])
-	
+
 	# Let Python evaluate the filtered mathematical expression.
 	return eval(expression)
 
@@ -246,6 +249,7 @@ def comb(n, k):
 		return factorial(n) / (factorial(k) * factorial(n - k))
 	else:
 		return 0
+choose = comb
 combinations = comb
 combine = comb
 
