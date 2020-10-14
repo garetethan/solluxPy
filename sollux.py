@@ -1,7 +1,7 @@
 '''
 sollux.py
 https://github.com/garetethan/solluxPy
-Created on Dec 24, 2017
+Created on 2017-12-24.
 
 TODO:
 * Improve the replacement of `!` with `factorial(...)`.
@@ -15,7 +15,7 @@ from sys import argv
 VAR_NAME_REGEX = r'[a-zA-Z_]+'
 # Create a space for the user to store numbers temporarily (not between runs).
 # '_' stores the last calculated result, and '_precision' limits how many digits of floating point results are printed.
-variables = {'_': 0, '_precision': 6, 'e': e, 'pi': pi, 'tau': tau}
+variables = {'_': 0, '_precision': 9, 'e': e, 'pi': pi, 'tau': tau}
 
 def main():
 	'''Get an expression from the user at the command line. If it is a variable assignment, evaluate right hand side and save it. Otherwise, assume it to be a mathematical expression, evaluate it, and save and print the result.'''
