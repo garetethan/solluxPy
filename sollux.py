@@ -7,44 +7,46 @@ TODO:
 * Improve the replacement of `!` with `factorial(...)`.
 '''
 
+import argparse
 from math import *
-from re import fullmatch, sub
-from string import ascii_lowercase
+import re
+import string
 from sys import argv
 
+PRECISION_DEFAULT = 9
+PRECISION_DESCRIPTION = f'the number of significant figures to print (default {PRECISION_DEFAULT})'
+
 VAR_NAME_REGEX = r'[a-zA-Z_]+'
-# Create a space for the user to store numbers temporarily (not between runs).
-# '_' stores the last calculated result, and '_precision' limits how many digits of floating point results are printed.
-variables = {'_': 0, '_precision': 9, 'e': e, 'pi': pi, 'tau': tau}
 
 def main():
-	'''Get an expression from the user at the command line. If it is a variable assignment, evaluate right hand side and save it. Otherwise, assume it to be a mathematical expression, evaluate it, and save and print the result.'''
-	global variables
+	'''Get an expression from the user at the command line. If it is a variable assignment, evaluate the right hand side and save it. Otherwise, assume it to be a mathematical expression, evaluate it, and save and print the result.'''
+	# Create a space for the user to store numbers temporarily.
+	# '_' stores the last calculated result, and '_precision' limits how many digits of floating point results are printed.
+	variables = {'_': 0, 'e': e, 'pi': pi, 'tau': tau}
 
-	# Parse flags.
-	for flag in argv[1:]:
-		# 0 - 2 hyphens, then 'h' or 'help'.
-		if fullmatch(r'-{0,2}h(?:elp)?', flag):
-			printHelp()
-			return 1
-		# 0 - 2 hyphens, then 'p=' or 'precision=', then one or more digits.
-		elif fullmatch(r'-{0,2}p(?:recision)?=\d+', flag):
-			variables['_precision'] = int(flag.split('=', maxsplit=1)[1])
-		else:
-			print(f'Unrecognized flag: \'{argv[1]}\'.')
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-o', '--operations', '-f', '--functions', action='store_true', help='print the full list of supported operations (ie functions) and exit')
+	parser.add_argument('-p', '--precision', default=PRECISION_DEFAULT, type=int, help=PRECISION_DESCRIPTION, metavar='N')
+	args = parser.parse_args()
 
+	if args.operations:
+		with open('operations.md') as operationsFile:
+			print(operationsFile.read())
+			raise SystemExit()
+
+	variables['_precision'] = args.precision
 	print('Enter a mathematical expression to evaluate, a variable declaration, or \'exit\'.\n')
 
 	expression = ''
 	lineNumber = 0
 	while True:
 		expression = input('==> ')
-		lineVar = f'_{ascii_lowercase[lineNumber % 26]}'
+		lineVar = f'_{string.ascii_lowercase[lineNumber % 26]}'
 		lineNumber += 1
 		if expression.startswith('exit') or expression.startswith('quit'):
 			break
 		if expression == 'help':
-			printHelp()
+			print('Type an expression, like:\n37 / 3\nor:\n(3 - 4) * sin(pi / 2)')
 			continue
 		if '=' in expression:
 			varName, expression = expression.split('=', maxsplit=1)
@@ -52,7 +54,7 @@ def main():
 		else:
 			varName = None
 		try:
-			expression = insertVars(expression)
+			expression = insertVars(expression, variables)
 		except KeyError as err:
 			print(f'There is no variable called {err}.')
 			continue
@@ -64,8 +66,7 @@ def main():
 			continue
 		if varName:
 			# If any chars in varName are invalid, replace them with underscores.
-			if not fullmatch(VAR_NAME_REGEX, varName):
-				varName = sub(r'[^a-zA-Z_]', '_', varName)
+			varName = re.sub(r'[^a-zA-Z_]', '_', varName)
 			variables[varName] = variables[lineVar]
 			print(f'{lineVar} = {varName} = {variables[lineVar]:.{variables["_precision"]}g}')
 		else:
@@ -73,24 +74,14 @@ def main():
 
 	return 0
 
-def insertVars(expression):
-	'''Replace variable names with their values in expression.'''
-	# Make implicit multiplication between coefficients and functions and variables explicit.
-	expression = sub(r'(\d)([a-zA-Z_])', r'\1*\2', expression)
-	# Look for a variable name followed by anything but '('.
-	varFinder = VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
-	# Insert variable values.
-	expression = sub(varFinder, lambda m: str(variables[m[0]]), expression)
-	return expression
-
 def calc(expression):
 	'''Evaluate a string expression (returning a float). Do not catch any exceptions.'''
 
 	# Replace absolute-value bars with the abs() function that eval() will recognize.
 	# Assumes that absolute-value bars are never nested. (If they were it would likely make the expression ambiguous.)
-	expression = sub(r'\|(.*?)\|', r'abs(\1)', expression)
+	expression = re.sub(r'\|(.*?)\|', r'abs(\1)', expression)
 	# Replace <int>! with factorial(<int>). Does not bother trying to match non-integers since factorial() would reject them anyways.
-	expression = sub(r'(\d+)!', r'factorial(\1)', expression)
+	expression = re.sub(r'(\d+)!', r'factorial(\1)', expression)
 	# Replace '^' (Python XOR) with '**' (exponentiation) and ')(' with ')*(' (implicit multiplication).
 	replacements = {'^': '**', ')(': ')*('}
 	for old in replacements:
@@ -98,6 +89,16 @@ def calc(expression):
 
 	# Let Python evaluate the filtered mathematical expression.
 	return eval(expression)
+
+def insertVars(expression, variables):
+	'''Replace variable names with their values in expression.'''
+	# Make implicit multiplication between coefficients and functions and variables explicit.
+	expression = re.sub(r'(\d)([a-zA-Z_])', r'\1*\2', expression)
+	# Look for a variable name followed by anything but '('.
+	varFinder = VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
+	# Insert variable values.
+	expression = re.sub(varFinder, lambda m: str(variables[m[0]]), expression)
+	return expression
 
 # Define missing trig functions.
 def sec(x):
@@ -252,11 +253,6 @@ def comb(n, k):
 choose = comb
 combinations = comb
 combine = comb
-
-def printHelp():
-	with open('README.md', 'r') as helpFile:
-		for line in helpFile:
-			print(line, end='')
 
 if __name__ == '__main__':
 	main()
