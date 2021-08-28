@@ -186,13 +186,13 @@ def cb(x):
 	'''Cube.'''
 	return x ** 3
 
-def nroot(x, n):
+def root(x, n):
 	'''The `n`th root of x. `n` is used to represent the degree of the root because of [its use on Wikipedia](https://en.wikipedia.org/wiki/Nth_root).'''
 	return x ** (1 / n)
-nthroot = nroot
-rootn = nroot
-rootN = nroot
-yroot = nroot
+nroot = root
+rootn = root
+rootN = root
+yroot = root
 
 def cbrt(x):
 	'''Cube root.'''
