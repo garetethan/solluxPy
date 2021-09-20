@@ -13,6 +13,8 @@ Use | Explanation
 `x % y` | Modulo, AKA the remainder of division.
 <code>x &#124; y</code> | [Bit-wise OR](https://en.wikipedia.org/wiki/Bitwise_operation#OR).
 `x & y` | [Bit-wise AND](https://en.wikipedia.org/wiki/Bitwise_operation#OR).
+`min(x, y)` | Minimum.
+`max(x, y)` | Maximum.
 
 ## Imported
 All functions in [Python's math module](https://docs.python.org/3/library/math.html) are available (though some as noted below have different names). Here are a few I find useful:
