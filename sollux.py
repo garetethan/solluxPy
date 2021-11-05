@@ -61,18 +61,25 @@ def main():
 			print(f'There is no variable called {err}.')
 			continue
 		try:
-			variables[lineVar] = calc(expression)
-			variables['_'] = variables[lineVar]
+			result = calc(expression)
+			variables[lineVar] = result
+			variables['_'] = result
 		except (NameError, SyntaxError, ValueError, ZeroDivisionError) as err:
 			print(f'Error: {err}')
 			continue
+
+		print(f'{lineVar} = ', end='')
 		if varName:
 			# If any chars in varName are invalid, replace them with underscores.
 			varName = re.sub(r'[^a-zA-Z_]', '_', varName)
-			variables[varName] = variables[lineVar]
-			print(f'{lineVar} = {varName} = {variables[lineVar]:.{variables["_precision"]}g}')
+			variables[varName] = result
+			print(f'{varName} = ', end='')
+		# bool is a subclass of int
+		if isinstance(result, (float, int)) and not isinstance(result, bool):
+			print(f'{result:.{variables["_precision"]}g}')
+		# The result is not a number.
 		else:
-			print(f'{lineVar} = {variables[lineVar]:.{variables["_precision"]}g}')
+			print(result)
 
 	return 0
 
@@ -97,7 +104,7 @@ def insertVars(expression, variables):
 	# Make implicit multiplication between coefficients and functions and variables explicit.
 	expression = re.sub(r'(\d)([a-zA-Z_])', r'\1*\2', expression)
 	# Look for a variable name followed by anything but '('.
-	varFinder = VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
+	varFinder = r'(?<![a-zA-Z_\.])' + VAR_NAME_REGEX + r'(?![a-zA-Z_(])'
 	# Insert variable values.
 	expression = re.sub(varFinder, lambda m: str(variables[m[0]]), expression)
 	return expression
