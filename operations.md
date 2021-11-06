@@ -60,9 +60,11 @@ Use | Explanation
 `cbrt(x)` | The real cube root of `x` which has the same sign as `x`.
 `quadraticAdd(a, b, c)` | Attempts to find a real solution to ax<sup>2</sup> + bx + c = 0 using the [quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula) and adding the square root of the discriminant. Does not handle negative discriminants well. Also aliased as `quadraticA(a, b, c)`.
 `quadraticSubtract(a, b, c)` | Attempts to find a real solution to ax<sup>2</sup> + bx + c = 0 using the [quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula) and subtracting the square root of the discriminant. Does not handle negative discriminants well. Also aliased as `quadraticS(a, b, c)` and `quadraticB(a, b, c)`.
-`lcm(a, b)` | [Lowest (least) common multiple](https://en.wikipedia.org/wiki/Least_common_multiple), where `a` and `b` must be integers.
+`lcm(a, b)` | The [lowest (least) common multiple](https://en.wikipedia.org/wiki/Least_common_multiple), where `a` and `b` must be integers.
 `perm(n, k=None)` | *Overwrites math.perm in Python 3.8+.* The number of ways to order `n` items (when `k` is not given), or the number of ways to select `k` items from `n` items when the order of the selected items matters (ie [permutations](https://en.wikipedia.org/wiki/Permutation)). Also aliased as `permutations(n, k)` and `permute(n, k)`.
 `comb(n, k)` | *Overwrites math.comb in Python 3.8+.* The number of ways to select `k` items from `n` items when the order of the selected items does not matter (ie [combinations](https://en.wikipedia.org/wiki/Combination)). Also aliased as `combinations(n, k)` and `combine(n, k)`.
+`totient(n)` | [Euler's totient function](https://en.wikipedia.org/wiki/Euler%27s_totient_function), where `n` must be an integer.
+`divisors(n)` | The [divisor function](https://en.wikipedia.org/wiki/Divisor_function), where `n` must be an integer.
 
 ### [Trigonometric functions](https://en.wikipedia.org/wiki/Trigonometric_functions#Right-angled_triangle_definitions)
 Use | Explanation

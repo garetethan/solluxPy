@@ -151,3 +151,9 @@ def comb(n, k):
 choose = comb
 combinations = comb
 combine = comb
+
+def totient(n):
+	return sum(1 if math.gcd(n, k) == 1 else 0 for k in range(1, n))
+
+def divisors(n):
+	return sum(1 if n % k == 0 else 0 for k in range(1, n + 1))
