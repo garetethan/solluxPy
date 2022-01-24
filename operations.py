@@ -1,5 +1,10 @@
 import math
 
+# Aliases of provided trig functions.
+arcsin = math.asin
+arccos = math.acos
+arctan = math.atan
+
 # Define missing trig functions.
 def sec(x):
 	'''Secant.'''
@@ -16,10 +21,12 @@ def cot(x):
 def asec(x):
 	'''Arcsecant.'''
 	return math.acos(1 / x)
+arcsec = asec
 
 def acsc(x):
 	'''Arccosecant.'''
 	return math.asin(1 / x)
+arccsc = acsc
 
 def acot(x):
 	'''Arccotangent.'''
@@ -27,6 +34,7 @@ def acot(x):
 		return -math.pi / 2
 	else:
 		return math.atan(1 / x)
+arccot = acot
 
 # Define trig functions that assume inputs are in degrees.
 def sind(x):
@@ -57,26 +65,32 @@ def cotd(x):
 def asind(x):
 	'''Arcsine (degrees).'''
 	return math.degrees(math.asin(x))
+arcsind = asind
 
 def acosd(x):
 	'''Arccosine (degrees).'''
 	return math.degrees(math.acos(x))
+arccosd = acosd
 
 def atand(x):
 	'''Arctangent (degrees).'''
 	return math.degrees(math.atan(x))
+arctand = atand
 
 def asecd(x):
 	'''Arcsecant (degrees).'''
 	return math.degrees(asec(x))
+arcsecd = asecd
 
 def acscd(x):
 	'''Arccosecant (degrees).'''
 	return math.degrees(acsc(x))
+arccscd = acscd
 
 def acotd(x):
 	'''Arccotangent (degrees).'''
 	return math.degrees(acot(x))
+arccotd = acotd
 
 def sq(x):
 	'''Square.'''

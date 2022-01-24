@@ -38,9 +38,9 @@ Use | Explanation
 `sin(x)` | Sine, where `x` is in radians.
 `cos(x)` | Cosine, where `x` is in radians.
 `tan(x)` | Tangent, where `x` is in radians.
-`asin(x)` | Arcsine, AKA inverse sine, where <code>-1 &le; x &le; 1</code>, `asin(x)` is in radians, and <code>-π / 2 &le; asin(x) &le; π / 2</code>.
-`acos(x)` | Arccosine, AKA inverse cosine, where <code>-1 &le; x &le; 1</code>, `acos(x)` is in radians, and <code>0 &le; acos(x) &le; π</code>.
-`atan(x)` | Arctangent, AKA inverse tangent, where `atan(x)` is in radians and <code>-π / 2 &le; atan(x) &le; π / 2</code>.
+`asin(x)` | Arcsine, AKA inverse sine, where <code>-1 &le; x &le; 1</code>, `asin(x)` is in radians, and <code>-π / 2 &le; asin(x) &le; π / 2</code>. Also aliased as `arcsin(x)`.
+`acos(x)` | Arccosine, AKA inverse cosine, where <code>-1 &le; x &le; 1</code>, `acos(x)` is in radians, and <code>0 &le; acos(x) &le; π</code>. Also aliased as `arccos(x)`.
+`atan(x)` | Arctangent, AKA inverse tangent, where `atan(x)` is in radians and <code>-π / 2 &le; atan(x) &le; π / 2</code>. Also aliased as `arctan(x)`.
 
 ### New in Python 3.8
 These functions are imported from the math module in Python 3.8+, but I have *overwritten* them with my own implementations (that, as far as I know, are identical) because Python 3.8 is [not in Debian Buster yet](https://packages.debian.org/search?suite=buster&keywords=python3.8) (last checked 2021-05-08). The next section defines each of them in more detail.
@@ -72,18 +72,18 @@ Use | Explanation
 `sec(x)` | Secant, where `x` is in radians.
 `csc(x)` | Cosecant, where `x` is in radians.
 `cot(x)` | Cotangent, where `x` is in radians.
-`asec(x)` | Arcsecant, where `x` is outside the range `(-1, 1)`, `asec(x)` is in radians, and <code>0 &le; asec(x) &le; π</code>.
-`acsc(x)` | Arccosecant, where `x` is outside the range `(-1, 1)`, `acsc(x)` is in radians, and <code>-π / 2 &le; acsc(x) &le; π / 2</code>.
-`acot(x)` | Arccotangent, where `acot(x)` is in radians and <code>-π / 2 &le; acot(x) &le; π / 2</code>.
+`asec(x)` | Arcsecant, where `x` is outside the range `(-1, 1)`, `asec(x)` is in radians, and <code>0 &le; asec(x) &le; π</code>. Also aliased as `arcsec(x)`.
+`acsc(x)` | Arccosecant, where `x` is outside the range `(-1, 1)`, `acsc(x)` is in radians, and <code>-π / 2 &le; acsc(x) &le; π / 2</code>. Also aliased as `arccsc(x)`.
+`acot(x)` | Arccotangent, where `acot(x)` is in radians and <code>-π / 2 &le; acot(x) &le; π / 2</code>. Also aliased as `arccot(x)`.
 `sind(x)` | Sine, where `x` is in degrees.
 `cosd(x)` | Cosine, where `x` is in degrees.
 `tand(x)` | Tangent, where `x` is in degrees.
 `secd(x)` | Secant, where `x` is in degrees.
 `cscd(x)` | Cosecant, where `x` is in degrees.
 `cotd(x)` | Cotangent, where `x` is in degrees.
-`asind(x)` | Arcsine, where <code>-1 &le; x &le; 1</code>, `asind(x)` is in degrees, and <code>-90 &le; asind(x) &le; 90</code>.
-`acosd(x)` | Arccosine, where <code>-1 &le; x &le; 1</code>, `acosd(x)` is in degrees, and <code>0 &le; acosd(x) &le; 180</code>.
-`atand(x)` | Arctangent, where `atand(x)` is in degrees and <code>-90 &le; atand(x) &le; 90</code>.
-`asecd(x)` | Arcsecant, where `x` is outside the range `(-1, 1)`, `asecd(x)` is in degrees, and <code>0 &le; asecd(x) &le; 180</code>.
-`acscd(x)` | Arccosecant, where `x` is outside the range `(-1, 1)`, `acscd(x)` is in degrees, and <code>-90 &le; acscd(x) &le; 90</code>.
-`acotd(x)` | Arccotangent, where `acotd(x)` is in degrees and <code>-90 &le; acotd(x) &le; 90</code>.
+`asind(x)` | Arcsine, where <code>-1 &le; x &le; 1</code>, `asind(x)` is in degrees, and <code>-90 &le; asind(x) &le; 90</code>. Also aliased as `arcsind(x)`.
+`acosd(x)` | Arccosine, where <code>-1 &le; x &le; 1</code>, `acosd(x)` is in degrees, and <code>0 &le; acosd(x) &le; 180</code>. Also aliased as `arccosd(x)`.
+`atand(x)` | Arctangent, where `atand(x)` is in degrees and <code>-90 &le; atand(x) &le; 90</code>. Also aliased as `arctand(x)`.
+`asecd(x)` | Arcsecant, where `x` is outside the range `(-1, 1)`, `asecd(x)` is in degrees, and <code>0 &le; asecd(x) &le; 180</code>. Also aliased as `arcsecd(x)`.
+`acscd(x)` | Arccosecant, where `x` is outside the range `(-1, 1)`, `acscd(x)` is in degrees, and <code>-90 &le; acscd(x) &le; 90</code>. Also aliased as `arccscd(x)`.
+`acotd(x)` | Arccotangent, where `acotd(x)` is in degrees and <code>-90 &le; acotd(x) &le; 90</code>. Also aliased as `arccotd(x)`.
