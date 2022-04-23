@@ -17,7 +17,7 @@ Use | Explanation
 `max(x, y)` | Maximum.
 
 ## Imported
-All functions in [Python's math module](https://docs.python.org/3/library/math.html) are available (though some as noted below have different names). Here are some I find useful:
+All functions in [Python's math module](https://docs.python.org/3/library/math.html) are available (though, as noted below, some have different names). Here are some I find useful:
 
 Use | Explanation
 --- | ---
@@ -30,6 +30,8 @@ Use | Explanation
 `gcd(a, b)` | The [greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor) of `a` and `b`, where `a` and `b` must be integers.
 `floor(x)` | The [floor](https://en.wikipedia.org/wiki/Floor_and_ceiling_functions) of `x`.
 `ceil(x)` | The [ceiling](https://en.wikipedia.org/wiki/Floor_and_ceiling_functions) of `x`.
+`perm(n, k=None)` | The number of [permutations](https://en.wikipedia.org/wiki/Permutation) of `k` elements selected from `n` elements. `k` defaults to `n` if not specified.
+`comb(n, k)` | The number of [combinations](https://en.wikipedia.org/wiki/Combination) of `k` elements selected from `n` elements.
 
 ### [Trigonometric functions](https://en.wikipedia.org/wiki/Trigonometric_functions#Right-angled_triangle_definitions)
 
@@ -41,14 +43,6 @@ Use | Explanation
 `asin(x)` | Arcsine, AKA inverse sine, where <code>-1 &le; x &le; 1</code>, `asin(x)` is in radians, and <code>-π / 2 &le; asin(x) &le; π / 2</code>. Also aliased as `arcsin(x)`.
 `acos(x)` | Arccosine, AKA inverse cosine, where <code>-1 &le; x &le; 1</code>, `acos(x)` is in radians, and <code>0 &le; acos(x) &le; π</code>. Also aliased as `arccos(x)`.
 `atan(x)` | Arctangent, AKA inverse tangent, where `atan(x)` is in radians and <code>-π / 2 &le; atan(x) &le; π / 2</code>. Also aliased as `arctan(x)`.
-
-### New in Python 3.8
-These functions are imported from the math module in Python 3.8+, but I have *overwritten* them with my own implementations (that, as far as I know, are identical) because Python 3.8 is [not in Debian Buster yet](https://packages.debian.org/search?suite=buster&keywords=python3.8) (last checked 2021-05-08). The next section defines each of them in more detail.
-
-Use | Explanation
---- | ---
-`perm(n, k=None)` | Permutations.
-`comb(n, k)` | Combinations.
 
 ## Implemented
 
